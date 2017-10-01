@@ -14,12 +14,21 @@ module.exports = function() {
 
       var synth = SPM.getInstrumentForChannel(channel);
 
-      var note = SPM.getNoteFromText(text);
+      var accTime = 0;
 
-      var time = SPM.getSustainFromText(text);
+      for (var word of text.split(' ')) {
+        if (word.length == 0){
+          accTime += 0.5;
+          continue;
+        }
 
-      synth.triggerAttackRelease(note, time);
+        var note = SPM.getNoteFromWord(word);
+        var time = SPM.getSustainFromWord(word);
 
+        synth.triggerAttackRelease(note, time, '+' + accTime);
+
+        accTime += time;
+      }
     }
 
     SPM.getInstrumentForChannel = function(channel) {
@@ -37,15 +46,19 @@ module.exports = function() {
       }).toMaster();
     }
 
-    SPM.getNoteFromText = function(text) {
+    SPM.getNoteFromWord = function(word) {
       var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
       var note = 'C';
       var octave = 1;
       var maxLength = notes.length * 5;
 
+      if (word.length == 0) {
+        return notes[0] + octave;
+      }
+
       var charCode = -1; // chr('!') == 33
 
-      for (var l of text.split('')) {
+      for (var l of word.split('')) {
         charCode += l.charCodeAt(0) - 32;
       }
 
@@ -53,13 +66,11 @@ module.exports = function() {
       octave = Math.floor(charCode / notes.length) + 1;
       note = notes[charCode % notes.length];
 
-      console.log(note + octave);
-
       return note + octave;
     }
 
-    SPM.getSustainFromText = function(text) {
-      return text.length * 0.1;
+    SPM.getSustainFromWord = function(word) {
+      return word.length * 0.1;
     }
 
     return SPM;
