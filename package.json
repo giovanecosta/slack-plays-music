@@ -1,0 +1,37 @@
+{
+  "name": "slack-plays-music",
+  "version": "0.1.0",
+  "description": "A nice App that connects with slack and plays music according to channels activity",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter nyan",
+    "start": "npm run build && http-server -a localhost -p 8000",
+    "reset": "rm -rf public && mkdir public",
+    "bundlejs": "node node_modules/browserify/bin/cmd.js -r tone -r ./index.js > public/bundle.js",
+    "build": "npm run reset && cp index.html public/ && npm run bundlejs"
+  },
+  "engines": {
+    "node": ">=5.4.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giovanecosta/slack-plays-music.git"
+  },
+  "keywords": [
+    "slack",
+    "tonejs",
+    "music"
+  ],
+  "author": "Giovane Tomaz <gigio.coder@gmail.com> (https://github.com/giovanecosta)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/giovanecosta/slack-plays-music/issues"
+  },
+  "homepage": "https://github.com/giovanecosta/slack-plays-music#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "browserify": "^14.4.0",
+    "http-server": "^0.10.0",
+    "tone": "^0.11.11"
+  }
+}
