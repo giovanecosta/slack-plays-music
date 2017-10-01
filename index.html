@@ -4,10 +4,15 @@
     <script src="bundle.js"></script>
     <script>
       var SPM = require('/index.js');
-      SPM.play();
+
+      function mandaver(){
+        SPM.play(opa.value);
+      }
     </script>
   </head>
   <body>
     <h1>It Works!</h1>
+    <textarea name="" id="opa" cols="30" rows="10"></textarea>
+    <button onclick="mandaver()">Mandaver!</button>
   </body>
 </html>
