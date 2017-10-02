@@ -8,8 +8,55 @@
       SPM.start();
 
     </script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: content-box;
+      }
+
+      body, #panel {
+        background-color: #9bf;
+        display: flex;
+        flex-direction: column;
+        font-family: arial;
+        height: 100vh;
+      }
+
+      #panel div {
+        flex-shrink: 0;
+        flex-grow: 1;
+      }
+
+      #panel div span {
+        margin: 20px;
+        display: inline-block;
+        background-color: #000;
+        color: white;
+        font-size: 15px;
+        padding: 5px;
+      }
+
+      #info {
+        position: fixed;
+        bottom: 12px;
+        right: 0;
+        left: 0;
+        color: white;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      #info a {
+        color: white;
+      }
+    </style>
   </head>
   <body>
-    <h1>It Works!</h1>
+    <div id="panel">
+
+    </div>
+    <div id="info">Slack Plays Music by <a href="http://github.com/giovanecosta">Giovane Tomaz</a></div>
   </body>
 </html>

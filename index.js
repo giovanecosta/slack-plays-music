@@ -10,6 +10,8 @@ module.exports = function() {
 
     var Tone = require('tone');
 
+    var $ = require('jquery');
+
     SPM.connect = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -31,7 +33,7 @@ module.exports = function() {
           return;
         }
 
-        SPM.play(json.text, json.channel);
+        SPM.play(json.text, json.channel, json.user);
       };
     }
 
@@ -39,24 +41,44 @@ module.exports = function() {
       SPM.connect();
     }
 
-    SPM.play = function(text, channel) {
+    SPM.play = function(text, channel, user) {
+      // TODO separate play from draw
+      var channelDiv = $('#' + channel);
 
-      var synth = SPM.getInstrumentForChannel(channel);
+      // Verify if a can play with div presence can not be the best way but is very simpĺe
+      if (channelDiv.length == 0) {
+        channelDiv = $('<div id="' + channel + '"></div>');
+        channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
+        $('#panel').append(channelDiv);
 
-      var accTime = 0;
+        var synth = SPM.getInstrumentForChannel(channel);
 
-      for (var word of text.split(' ')) {
-        if (word.length == 0){
-          accTime += 0.5;
-          continue;
+        var accTime = 0;
+
+        for (var word of text.split(' ')) {
+          if (word.length == 0){
+            accTime += 0.5;
+            continue;
+          }
+
+          var note = SPM.getNoteFromWord(word);
+          var time = SPM.getSustainFromWord(word);
+
+          synth.triggerAttackRelease(note, time, '+' + accTime);
+
+          (function(_word){
+            window.setTimeout(function(){
+              channelDiv.css({backgroundColor: SPM.getColorFromWord(_word)});
+            }, accTime * 1000);
+          }(word));
+
+          accTime += time;
         }
 
-        var note = SPM.getNoteFromWord(word);
-        var time = SPM.getSustainFromWord(word);
+        window.setTimeout(function(){
+          channelDiv.remove();
+        }, accTime * 1000);
 
-        synth.triggerAttackRelease(note, time, '+' + accTime);
-
-        accTime += time;
       }
     }
 
@@ -74,6 +96,24 @@ module.exports = function() {
       //   }
       // }).toMaster();
       return new Tone.Synth().toMaster();
+    }
+
+    SPM.getColorFromWord = function(word) {
+      var maxLength = 256 * 256 * 256;
+
+      var charCode = -1; // chr('!') == 33
+
+      for (var l of word.split('')) {
+        charCode += (l.charCodeAt(0) - 32) * Math.floor(maxLength / 60); // must sync with notes C1 = black B5 = white
+      }
+
+      charCode = (charCode % maxLength);
+
+      var color = '#' + ('000000' + (charCode).toString(16)).slice(-6);
+
+      console.log(color)
+
+      return color;
     }
 
     SPM.getNoteFromWord = function(word) {
