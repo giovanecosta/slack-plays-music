@@ -7,7 +7,7 @@
     "test": "mocha --reporter nyan",
     "start": "npm run build && http-server -a localhost -p 8000",
     "reset": "rm -rf public && mkdir public",
-    "bundlejs": "node node_modules/browserify/bin/cmd.js -r tone -r ./index.js > public/bundle.js",
+    "bundlejs": "node node_modules/browserify/bin/cmd.js -r tone -r ./index.js -r jquery > public/bundle.js",
     "build": "npm run reset && cp index.html public/ && npm run bundlejs"
   },
   "engines": {
@@ -32,6 +32,7 @@
   "dependencies": {
     "browserify": "^14.4.0",
     "http-server": "^0.10.0",
+    "jquery": "^3.2.1",
     "tone": "^0.11.11"
   }
 }
