@@ -15,7 +15,7 @@ module.exports = function() {
     SPM.connect = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-      var connection = new WebSocket('ws://127.0.0.1:1337');
+      var connection = new WebSocket('ws://' + window.location.hostname + ':1337');
 
       connection.onopen = function () {
         console.log('[WS conn OK]');

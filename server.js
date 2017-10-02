@@ -67,6 +67,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
   var dm = rtm.dataStore.getDMById(messageData.channel);
   var user = rtm.dataStore.getUserById(messageData.user);
   var bot = rtm.dataStore.getBotById(messageData.user);
+  var who = user || bot;
 
   if (channel) {
     origin = channel.name;
@@ -74,8 +75,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
     origin = 'direct';
   }
 
-  if (origin) {
-    sendActivity(messageData.text, origin, (user || bot).name);
+  if (origin && who) {
+    sendActivity(messageData.text, origin, who.name);
   }
 
 });
