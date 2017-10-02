@@ -44,10 +44,10 @@ wsServer.on('request', function(request) {
   })
 });
 
-function sendActivity(text, channel) {
+function sendActivity(text, channel, user) {
   var count = 0;
   for (var id in connections){
-    connections[id].sendUTF(JSON.stringify({text: text, channel: channel}));
+    connections[id].sendUTF(JSON.stringify({text: text, channel: channel, user: user}));
     count++;
   }
   console.log('Broadcasted for ' + count + ' connections.');
@@ -65,6 +65,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
   var origin = false;
   var channel = rtm.dataStore.getChannelById(messageData.channel);
   var dm = rtm.dataStore.getDMById(messageData.channel);
+  var user = rtm.dataStore.getUserById(messageData.user);
 
   if (channel) {
     origin = channel.name;
@@ -73,7 +74,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
   }
 
   if (origin) {
-    sendActivity(messageData.text, origin);
+    sendActivity(messageData.text, origin, user.name);
   }
 
 });
