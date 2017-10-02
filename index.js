@@ -50,6 +50,7 @@ module.exports = function() {
         channelDiv = $('<div id="' + channel + '"></div>');
         channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
         $('#panel').append(channelDiv);
+        channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
 
         var synth = SPM.getInstrumentForChannel(channel);
 
@@ -68,7 +69,7 @@ module.exports = function() {
 
           (function(_word){
             window.setTimeout(function(){
-              channelDiv.css({backgroundColor: SPM.getColorFromWord(_word)});
+              channelDiv.css({background: SPM.getColorFromWord(_word)});
             }, accTime * 1000);
           }(word));
 
@@ -76,8 +77,11 @@ module.exports = function() {
         }
 
         window.setTimeout(function(){
-          channelDiv.remove();
-        }, accTime * 1000);
+          channelDiv.css({transition: 'initial'});
+          channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
+            channelDiv.remove();
+          });
+        }, accTime * 1000); // 0.5s transition
 
       }
     }
@@ -110,8 +114,6 @@ module.exports = function() {
       charCode = (charCode % maxLength);
 
       var color = '#' + ('000000' + (charCode).toString(16)).slice(-6);
-
-      console.log(color)
 
       return color;
     }
