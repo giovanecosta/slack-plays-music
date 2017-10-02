@@ -54,7 +54,7 @@ function sendActivity(text, channel, user) {
 }
 
 function serverReady(server){
-  console.log( 'Server on port ' + server.config.port + 'is now up');
+  console.log( 'Server on port ' + server.config.port + ' is now up');
 }
 
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
@@ -66,6 +66,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
   var channel = rtm.dataStore.getChannelById(messageData.channel);
   var dm = rtm.dataStore.getDMById(messageData.channel);
   var user = rtm.dataStore.getUserById(messageData.user);
+  var bot = rtm.dataStore.getBotById(messageData.user);
 
   if (channel) {
     origin = channel.name;
@@ -74,7 +75,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (messageData) {
   }
 
   if (origin) {
-    sendActivity(messageData.text, origin, user.name);
+    sendActivity(messageData.text, origin, (user || bot).name);
   }
 
 });
