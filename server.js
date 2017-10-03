@@ -98,6 +98,16 @@ rtm.on(RTM_EVENTS.PRESENCE_CHANGE, function(presenceData) {
   }
 });
 
+rtm.on(RTM_EVENTS.REACTION_ADDED, function(reactionData) {
+  var who = getUserOrBot(reactionData.user);
+
+  if (who && reactionData.item.channel) {
+    var channel = rtm.dataStore.getChannelById(reactionData.item.channel);
+    // emojis will be specially processed in client side
+    sendActivity(':' + reactionData.reaction + ':', channel.name, who.name);
+  }
+
+});
 
 
 rtm.start();
