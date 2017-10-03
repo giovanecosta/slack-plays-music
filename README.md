@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/giovanecosta/slack-plays-music.svg?branch=master)](https://travis-ci.org/giovanecosta/slack-plays-music) [![Coverage Status](https://coveralls.io/repos/github/giovanecosta/slack-plays-music/badge.svg?branch=master)](https://coveralls.io/github/giovanecosta/slack-plays-music?branch=master)
+
 # slack-plays-music
 
   A nice App that connects with slack and plays music according to channels activity.
