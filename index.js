@@ -87,10 +87,20 @@ module.exports = function() {
     }
 
     SPM.prototype.draw = function(text, channel, user) {
-      var channelDiv = $('<div class="' + channel + '"></div>');
-      channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
-      $('#panel').append(channelDiv);
-      channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
+      var channelDiv = $('#' + channel);
+
+      if (channelDiv.length == 0) {
+        channelDiv = $('<div class="channel" id="' + channel + '"></div>');
+        channelDiv.append('<span> ' + channel + '</span>');
+        $('#panel').append(channelDiv);
+        channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
+        channelDiv.css({background: this.getColorForChannel(channel)});
+      }
+
+      var activityDiv = $('<div class="activity"></div>');
+      activityDiv.append('<span> @' + user + '.</span>'); // TODO add activity description
+      channelDiv.append(activityDiv);
+      activityDiv.animate({flexGrow: 1});
 
       var accTime = 0;
 
@@ -104,7 +114,7 @@ module.exports = function() {
 
         (function(_this, _word){
           window.setTimeout(function(){
-            channelDiv.css({background: _this.getColorFromWord(_word)});
+            activityDiv.css({background: _this.getColorFromWord(_word)});
           }, accTime * 1000);
         }(this, word));
 
@@ -112,9 +122,15 @@ module.exports = function() {
       }
 
       window.setTimeout(function(){
-        channelDiv.css({transition: 'initial'});
-        channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
-          channelDiv.remove();
+        activityDiv.css({transition: 'initial'});
+        activityDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
+          activityDiv.remove();
+
+          if(channelDiv.find('div').length == 0) {
+            channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
+              channelDiv.remove();
+            }); // OMG this indentation D:
+          }
         });
       }, accTime * 1000);
     }
@@ -133,6 +149,10 @@ module.exports = function() {
       //   }
       // }).toMaster();
       return new this.tone.Synth().toMaster();
+    }
+
+    SPM.prototype.getColorForChannel = function (channel) {
+      return '#ccc';
     }
 
     // I really don't know how can i name this number

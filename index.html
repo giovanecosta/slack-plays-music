@@ -27,13 +27,36 @@
         height: 100vh;
       }
 
-      #panel div {
+      #panel .channel {
+        flex-shrink: 0;
+        flex-grow: 0;
+        transition: 0.5s;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+      }
+
+      #panel .channel > span {
+        display: inline-block;
+        position: absolute;
+        margin: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 80px;
+        text-align: center;
+      }
+
+      #panel .activity {
         flex-shrink: 0;
         flex-grow: 0;
         transition: 0.5s;
       }
 
-      #panel div span {
+      #panel .activity > span {
         margin: 20px;
         display: inline-block;
         background-color: #000;
