@@ -17,6 +17,8 @@ module.exports = function() {
 
     SPM.MAX_OCTAVE = 6;
 
+    SPM.CHAR_TIME = 0.25; // in seconds
+
     SPM.prototype.start = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -61,11 +63,7 @@ module.exports = function() {
     }
 
     SPM.prototype.play = function(text, channel, user) {
-
-      var channelDiv = $('<div class="' + channel + '"></div>');
-      channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
-      $('#panel').append(channelDiv);
-      channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
+      console.log('@' + user + ' in ' + channel);
 
       var synth = this.getInstrumentForChannel(channel);
 
@@ -73,7 +71,7 @@ module.exports = function() {
 
       for (var word of text.split(' ')) {
         if (word.length == 0){
-          accTime += 0.5;
+          accTime += SPM.CHAR_TIME; // blank space
           continue;
         }
 
@@ -81,6 +79,28 @@ module.exports = function() {
         var time = this.getSustainFromWord(word);
 
         synth.triggerAttackRelease(note, time, '+' + accTime);
+
+        accTime += time;
+      }
+
+      this.draw(text, channel, user);
+    }
+
+    SPM.prototype.draw = function(text, channel, user) {
+      var channelDiv = $('<div class="' + channel + '"></div>');
+      channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
+      $('#panel').append(channelDiv);
+      channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
+
+      var accTime = 0;
+
+      for (var word of text.split(' ')) {
+        if (word.length == 0){
+          accTime += SPM.CHAR_TIME; // blank space
+          continue;
+        }
+
+        var time = this.getSustainFromWord(word);
 
         (function(_this, _word){
           window.setTimeout(function(){
@@ -96,7 +116,7 @@ module.exports = function() {
         channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
           channelDiv.remove();
         });
-      }, accTime * 1000); // 0.5s transition
+      }, accTime * 1000);
     }
 
     SPM.prototype.getInstrumentForChannel = function(channel) {
@@ -132,10 +152,7 @@ module.exports = function() {
 
       magicNumber = Math.floor((magicNumber * maxLength) / maxMagicNumberLength);
 
-      var color = '#' + ('000000' + (magicNumber).toString(16)).slice(-6);
-
-      console.log(color);
-      return color;
+      return '#' + ('000000' + (magicNumber).toString(16)).slice(-6);
     }
 
     SPM.prototype.getNoteFromWord = function(word) {
@@ -155,7 +172,7 @@ module.exports = function() {
     }
 
     SPM.prototype.getSustainFromWord = function(word) {
-      return word.length * 0.1;
+      return word.length * SPM.CHAR_TIME;
     }
 
     return SPM;
