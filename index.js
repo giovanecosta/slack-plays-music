@@ -11,6 +11,12 @@ module.exports = function() {
       this.connection = undefined;
     };
 
+    SPM.NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    SPM.MIN_OCTAVE = 1;
+
+    SPM.MAX_OCTAVE = 6;
+
     SPM.prototype.start = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -109,42 +115,42 @@ module.exports = function() {
       return new this.tone.Synth().toMaster();
     }
 
-    SPM.prototype.getColorFromWord = function(word) {
-      var maxLength = 256 * 256 * 256;
-
-      var charCode = -1; // chr('!') == 33
-
+    // I really don't know how can i name this number
+    SPM.prototype.getMagicNumberFromWord = function(word) {
+      var maxLength = SPM.NOTES.length * (SPM.MAX_OCTAVE - SPM.MIN_OCTAVE + 1);
+      var charCode = -1;
       for (var l of word.split('')) {
-        charCode += (l.charCodeAt(0) - 32) * Math.floor(maxLength / 60); // must sync with notes C1 = black B5 = white
+        charCode += l.charCodeAt(0) - '!'.charCodeAt(0) + 1; // ! is the first valid char
       }
+      return charCode % maxLength;
+    }
 
-      charCode = (charCode % maxLength);
+    SPM.prototype.getColorFromWord = function(word) {
+      var maxLength = 256 * 256 * 256; // #FFFFFF
+      var maxMagicNumberLength = SPM.NOTES.length * (SPM.MAX_OCTAVE - SPM.MIN_OCTAVE + 1);
+      var magicNumber = this.getMagicNumberFromWord(word);
 
-      var color = '#' + ('000000' + (charCode).toString(16)).slice(-6);
+      magicNumber = Math.floor((magicNumber * maxLength) / maxMagicNumberLength);
 
+      var color = '#' + ('000000' + (magicNumber).toString(16)).slice(-6);
+
+      console.log(color);
       return color;
     }
 
     SPM.prototype.getNoteFromWord = function(word) {
-      var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-      var note = 'C';
-      var octave = 1;
-      var maxLength = notes.length * 5;
+      var notes = SPM.NOTES;
+      var octave = SPM.MIN_OCTAVE;
+      var note = notes[0];
 
       if (word.length == 0) {
-        return notes[0] + octave;
+        return notes[0] + octave; // just a fallback
       }
 
-      var charCode = -1; // chr('!') == 33
+      var magicNumber = this.getMagicNumberFromWord(word);
 
-      for (var l of word.split('')) {
-        charCode += l.charCodeAt(0) - 32;
-      }
-
-      charCode = (charCode % maxLength);
-      octave = Math.floor(charCode / notes.length) + 1;
-      note = notes[charCode % notes.length];
-
+      octave = Math.floor(magicNumber / notes.length) + 1;
+      note = notes[magicNumber % notes.length];
       return note + octave;
     }
 
