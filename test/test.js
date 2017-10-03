@@ -1,26 +1,47 @@
 'use strict';
 
-var chai = require('chai');
-var spies = require('chai-spies');
-
-chai.use(spies);
-
-var expect = chai.expect;
+var expect = require('chai').expect;
+var sinon = require('sinon');
 
 var SPM = require('../index');
 var MockTone = {};
-var MockDrawing = {};
+var drawingAdapter = {};
 
-var wsAdapter = chai.spy.object(['connect', 'registerListener']);
+var Tone = (function(){
+  var Synth = function(){
+
+  }
+
+  Synth.prototype.toMaster = sinon.spy();
+
+  return Synth
+});
+
+var wsAdapter = {connect: sinon.spy(), registerListener: sinon.spy()};
 
 describe('#SlackPlaysMusic', function() {
 
   describe('Main functionality', function(){
+
     context('Start App', function(){
-      var spm = new SPM(MockTone, wsAdapter, MockDrawing);
-      spm.start();
-      expect(wsAdapter.connect).to.have.been.called();
+
+      it('should call wsAdapter.connect on start', function(){
+        var spm = new SPM(Tone, wsAdapter, drawingAdapter);
+        spm.start();
+        expect(wsAdapter.connect.called).to.be.true;
+      });
+
+      it('should call play on WebSocket message', function() {
+        var spm = new SPM(MockTone, wsAdapter, drawingAdapter);
+        spm.start();
+        var play = sinon.stub(spm, 'play');
+
+        spm.onWsMessage({text: 'foo', channel: 'bar', user: 'zaa'});
+        expect(play.calledWith('foo', 'bar', 'zaa')).to.be.true;
+      });
+
     });
+
   });
 
   describe('Tranform functions', function(){
