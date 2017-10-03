@@ -23,9 +23,8 @@ module.exports = function() {
     SPM.CHAR_TIME = 0.25; // in seconds
 
     SPM.prototype.start = function() {
-      var ws = new this.wsAdapter('ws://' + window.location.hostname + ':1337');
-      ws.registerListener(this.onWsMessage.bind(this));
-      ws.connect();
+      this.wsAdapter.registerListener(this.onWsMessage.bind(this));
+      this.wsAdapter.connect();
     }
 
     SPM.prototype.onWsMessage = function(json) {
@@ -83,7 +82,7 @@ module.exports = function() {
         var time = this.getSustainFromWord(word);
 
         (function(_this, _word){
-          window.setTimeout(function(){
+          setTimeout(function(){
             activityDiv.css({background: _this.getColorFromWord(_word)});
           }, accTime * 1000);
         }(this, word));
@@ -91,7 +90,7 @@ module.exports = function() {
         accTime += time;
       }
 
-      window.setTimeout(function(){
+      setTimeout(function(){
         activityDiv.css({transition: 'initial'});
         activityDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
           activityDiv.remove();
