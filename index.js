@@ -1,14 +1,17 @@
 'use strict';
 
+var STATIC_MESSAGES = require('./constants.js').STATIC_MESSAGES;
+
 /**
  * Plays Crazy Music
  * @return {object}
  */
 module.exports = function() {
 
-    var SPM = function(toneClass){
+    var SPM = function(toneClass, wsAdapter, drawingAdapter){
       this.tone = toneClass;
-      this.connection = undefined;
+      this.wsAdapter = wsAdapter;
+      this.drawingAdapter = drawingAdapter;
     };
 
     SPM.NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -20,46 +23,13 @@ module.exports = function() {
     SPM.CHAR_TIME = 0.25; // in seconds
 
     SPM.prototype.start = function() {
-      window.WebSocket = window.WebSocket || window.MozWebSocket;
-
-      this.connect(window.WebSocket);
+      var ws = new this.wsAdapter('ws://' + window.location.hostname + ':1337');
+      ws.registerListener(this.onWsMessage.bind(this));
+      ws.connect();
     }
 
-    SPM.prototype.setupConnection = function() {
-      this.connection.onopen = function () {
-        console.log('[WS conn OK]');
-      };
-
-      this.connection.onclose = (function (_this) {
-        return function() {
-          console.log('[WS closed]');
-          window.setTimeout(function(){
-            _this.connect(window.WebSocket);
-          }, 1000);
-        }
-      })(this);
-
-      this.connection.onerror = function (error) {
-        console.log('Some error with WebSocket');
-      };
-
-      this.connection.onmessage = this.onWsMessage.bind(this);
-    }
-
-    SPM.prototype.onWsMessage = function(message) {
-      try {
-        var json = JSON.parse(message.data);
-      } catch (e) {
-        console.log('This doesn\'t look like a valid JSON: ', message.data);
-        return;
-      }
-
+    SPM.prototype.onWsMessage = function(json) {
       this.play(json.text, json.channel, json.user);
-    }
-
-    SPM.prototype.connect = function(WebSocketClass) {
-      this.connection = new WebSocketClass('ws://' + window.location.hostname + ':1337');
-      this.setupConnection();
     }
 
     SPM.prototype.play = function(text, channel, user) {
@@ -196,4 +166,4 @@ module.exports = function() {
     }
 
     return SPM;
-}(this);
+}();

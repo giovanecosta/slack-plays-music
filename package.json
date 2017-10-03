@@ -7,7 +7,7 @@
     "test": "mocha --reporter nyan",
     "start": "npm run build && node server.js",
     "reset": "rm -rf public && mkdir public",
-    "bundlejs": "node node_modules/browserify/bin/cmd.js -r tone -r ./index.js -r jquery > public/bundle.js",
+    "bundlejs": "node node_modules/browserify/bin/cmd.js -r ./dependencies.js > public/bundle.js",
     "build": "npm run reset && cp index.html public/ && npm run bundlejs",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },

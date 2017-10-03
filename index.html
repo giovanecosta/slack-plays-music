@@ -3,11 +3,12 @@
 
     <script src="bundle.js"></script>
     <script>
-      var $ = require('jquery');
-      var SPM = require('/index.js');
-      var Tone = require('tone');
+      var $ = require('/dependencies.js').$;
+      var SPM = require('/dependencies.js').SPM;
+      var Tone = require('/dependencies.js').Tone;
+      var WebSocketClient = require('/dependencies.js').WebSocketClient;
 
-      var spm = new SPM(Tone);
+      var spm = new SPM(Tone, WebSocketClient);
       spm.start();
 
     </script>
