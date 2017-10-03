@@ -9,7 +9,7 @@
     "reset": "rm -rf public && mkdir public",
     "bundlejs": "node node_modules/browserify/bin/cmd.js -r tone -r ./index.js -r jquery > public/bundle.js",
     "build": "npm run reset && cp index.html public/ && npm run bundlejs",
-    "test": "mocha --reporter nyan"
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
   "engines": {
     "node": ">=5.4.2"
@@ -31,6 +31,8 @@
   "homepage": "https://github.com/giovanecosta/slack-plays-music#readme",
   "devDependencies": {
     "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.5.3"
   },
   "dependencies": {
