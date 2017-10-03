@@ -3,9 +3,12 @@
 
     <script src="bundle.js"></script>
     <script>
+      var $ = require('jquery');
       var SPM = require('/index.js');
+      var Tone = require('tone');
 
-      SPM.start();
+      var spm = new SPM(Tone);
+      spm.start();
 
     </script>
 

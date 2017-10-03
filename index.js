@@ -6,13 +6,11 @@
  */
 module.exports = function() {
 
-    var SPM = function(){};
+    var SPM = function(toneClass){
+      this.tone = toneClass;
+    };
 
-    var Tone = require('tone');
-
-    var $ = require('jquery');
-
-    SPM.connect = function() {
+    SPM.prototype.connect = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
       var connection = new WebSocket('ws://' + window.location.hostname + ':1337');
@@ -25,6 +23,7 @@ module.exports = function() {
         console.log('Some error with WebSocket');
       };
 
+      var _that = this;
       connection.onmessage = function (message) {
         try {
           var json = JSON.parse(message.data);
@@ -33,61 +32,55 @@ module.exports = function() {
           return;
         }
 
-        SPM.play(json.text, json.channel, json.user);
+        _that.play(json.text, json.channel, json.user);
       };
     }
 
-    SPM.start = function() {
-      SPM.connect();
+    SPM.prototype.start = function() {
+      this.connect();
     }
 
-    SPM.play = function(text, channel, user) {
-      // TODO separate play from draw
-      var channelDiv = $('#' + channel);
+    SPM.prototype.play = function(text, channel, user) {
 
-      // Verify if a can play with div presence can not be the best way but is very simpĺe
-      if (channelDiv.length == 0) {
-        channelDiv = $('<div id="' + channel + '"></div>');
-        channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
-        $('#panel').append(channelDiv);
-        channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
+      var channelDiv = $('<div class="' + channel + '"></div>');
+      channelDiv.append('<span> @' + user + ' in ' + channel + '.</span>');
+      $('#panel').append(channelDiv);
+      channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
 
-        var synth = SPM.getInstrumentForChannel(channel);
+      var synth = this.getInstrumentForChannel(channel);
 
-        var accTime = 0;
+      var accTime = 0;
 
-        for (var word of text.split(' ')) {
-          if (word.length == 0){
-            accTime += 0.5;
-            continue;
-          }
-
-          var note = SPM.getNoteFromWord(word);
-          var time = SPM.getSustainFromWord(word);
-
-          synth.triggerAttackRelease(note, time, '+' + accTime);
-
-          (function(_word){
-            window.setTimeout(function(){
-              channelDiv.css({background: SPM.getColorFromWord(_word)});
-            }, accTime * 1000);
-          }(word));
-
-          accTime += time;
+      for (var word of text.split(' ')) {
+        if (word.length == 0){
+          accTime += 0.5;
+          continue;
         }
 
-        window.setTimeout(function(){
-          channelDiv.css({transition: 'initial'});
-          channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
-            channelDiv.remove();
-          });
-        }, accTime * 1000); // 0.5s transition
+        var note = this.getNoteFromWord(word);
+        var time = this.getSustainFromWord(word);
 
+        synth.triggerAttackRelease(note, time, '+' + accTime);
+
+        (function(_this, _word){
+          window.setTimeout(function(){
+            channelDiv.css({background: _this.getColorFromWord(_word)});
+          }, accTime * 1000);
+        }(this, word));
+
+        accTime += time;
       }
+
+      window.setTimeout(function(){
+        channelDiv.css({transition: 'initial'});
+        channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
+          channelDiv.remove();
+        });
+      }, accTime * 1000); // 0.5s transition
     }
 
-    SPM.getInstrumentForChannel = function(channel) {
-      // return new Tone.Synth({
+    SPM.prototype.getInstrumentForChannel = function(channel) {
+      // return new this.tone.Synth({
       //   "oscillator" : {
       //     "type" : "pwm",
       //     "modulationFrequency" : 0.2
@@ -99,10 +92,10 @@ module.exports = function() {
       //     "release" : 0.9,
       //   }
       // }).toMaster();
-      return new Tone.Synth().toMaster();
+      return new this.tone.Synth().toMaster();
     }
 
-    SPM.getColorFromWord = function(word) {
+    SPM.prototype.getColorFromWord = function(word) {
       var maxLength = 256 * 256 * 256;
 
       var charCode = -1; // chr('!') == 33
@@ -118,7 +111,7 @@ module.exports = function() {
       return color;
     }
 
-    SPM.getNoteFromWord = function(word) {
+    SPM.prototype.getNoteFromWord = function(word) {
       var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
       var note = 'C';
       var octave = 1;
@@ -141,7 +134,7 @@ module.exports = function() {
       return note + octave;
     }
 
-    SPM.getSustainFromWord = function(word) {
+    SPM.prototype.getSustainFromWord = function(word) {
       return word.length * 0.1;
     }
 
