@@ -8,36 +8,50 @@ module.exports = function() {
 
     var SPM = function(toneClass){
       this.tone = toneClass;
+      this.connection = undefined;
     };
 
-    SPM.prototype.connect = function() {
+    SPM.prototype.start = function() {
       window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-      var connection = new WebSocket('ws://' + window.location.hostname + ':1337');
+      this.connect(window.WebSocket);
+    }
 
-      connection.onopen = function () {
+    SPM.prototype.setupConnection = function() {
+      this.connection.onopen = function () {
         console.log('[WS conn OK]');
       };
 
-      connection.onerror = function (error) {
+      this.connection.onclose = (function (_this) {
+        return function() {
+          console.log('[WS closed]');
+          window.setTimeout(function(){
+            _this.connect(window.WebSocket);
+          }, 1000);
+        }
+      })(this);
+
+      this.connection.onerror = function (error) {
         console.log('Some error with WebSocket');
       };
 
-      var _that = this;
-      connection.onmessage = function (message) {
-        try {
-          var json = JSON.parse(message.data);
-        } catch (e) {
-          console.log('This doesn\'t look like a valid JSON: ', message.data);
-          return;
-        }
-
-        _that.play(json.text, json.channel, json.user);
-      };
+      this.connection.onmessage = this.onWsMessage.bind(this);
     }
 
-    SPM.prototype.start = function() {
-      this.connect();
+    SPM.prototype.onWsMessage = function(message) {
+      try {
+        var json = JSON.parse(message.data);
+      } catch (e) {
+        console.log('This doesn\'t look like a valid JSON: ', message.data);
+        return;
+      }
+
+      this.play(json.text, json.channel, json.user);
+    }
+
+    SPM.prototype.connect = function(WebSocketClass) {
+      this.connection = new WebSocketClass('ws://' + window.location.hostname + ':1337');
+      this.setupConnection();
     }
 
     SPM.prototype.play = function(text, channel, user) {
