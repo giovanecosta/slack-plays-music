@@ -3,15 +3,15 @@
 
     <script src="bundle.js"></script>
     <script>
-      var $ = require('/dependencies.js').$;
       var SPM = require('/dependencies.js').SPM;
-      var Tone = require('/dependencies.js').Tone;
       var WebSocketClient = require('/dependencies.js').WebSocketClient;
+      var DrawAdapter = require('/dependencies.js').DrawAdapter;
       var Instruments = require('/dependencies.js').Instruments;
 
       var wsAdapter = new WebSocketClient('ws://' + location.hostname + ':1337');
+      var drawAdapter = new DrawAdapter('#panel');
 
-      var spm = new SPM(Instruments, wsAdapter);
+      var spm = new SPM(Instruments, wsAdapter, drawAdapter);
       spm.start();
 
     </script>
@@ -31,7 +31,7 @@
         height: 100vh;
       }
 
-      #panel .channel {
+      #panel .subject {
         flex-shrink: 0;
         flex-grow: 0;
         transition: 0.5s;
@@ -40,7 +40,7 @@
         position: relative;
       }
 
-      #panel .channel > span {
+      #panel .subject > span {
         display: inline-block;
         position: absolute;
         margin: auto;
@@ -54,13 +54,13 @@
         text-align: center;
       }
 
-      #panel .activity {
+      #panel .text {
         flex-shrink: 0;
         flex-grow: 0;
         transition: 0.5s;
       }
 
-      #panel .activity > span {
+      #panel .text > span {
         margin: 20px;
         display: inline-block;
         background-color: #000;

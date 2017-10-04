@@ -8,10 +8,10 @@ var STATIC_MESSAGES = require('./constants.js').STATIC_MESSAGES;
  */
 module.exports = function() {
 
-    var SPM = function(instruments, wsAdapter, drawingAdapter){
+    var SPM = function(instruments, wsAdapter, drawAdapter){
       this.instruments = instruments;
       this.wsAdapter = wsAdapter;
-      this.drawingAdapter = drawingAdapter;
+      this.drawAdapter = drawAdapter;
     };
 
     SPM.NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -36,7 +36,6 @@ module.exports = function() {
 
       var instrument = this.getInstrumentForChannel(channel);
 
-
       var accTime = 0;
 
       for (var word of text.split(' ')) {
@@ -57,22 +56,10 @@ module.exports = function() {
     }
 
     SPM.prototype.draw = function(text, channel, user) {
-      var channelDiv = $('#' + channel);
-
-      if (channelDiv.length == 0) {
-        channelDiv = $('<div class="channel" id="' + channel + '"></div>');
-        channelDiv.append('<span> ' + channel + '</span>');
-        $('#panel').append(channelDiv);
-        channelDiv.animate({flexGrow: 1}); // all for the beauty of the world
-        channelDiv.css({background: this.getColorForChannel(channel)});
-      }
-
-      var activityDiv = $('<div class="activity"></div>');
-      activityDiv.append('<span> @' + user + '.</span>'); // TODO add activity description
-      channelDiv.append(activityDiv);
-      activityDiv.animate({flexGrow: 1});
 
       var accTime = 0;
+
+      var drawAgent = this.drawAdapter.draw(channel, '@' + user); // adds activity description
 
       for (var word of text.split(' ')) {
         if (word.length == 0){
@@ -81,28 +68,14 @@ module.exports = function() {
         }
 
         var time = this.getSustainFromWord(word);
+        var color = this.getColorFromWord(word);
 
-        (function(_this, _word){
-          setTimeout(function(){
-            activityDiv.css({background: _this.getColorFromWord(_word)});
-          }, accTime * 1000);
-        }(this, word));
+        drawAgent.animate(color, accTime);
 
         accTime += time;
       }
 
-      setTimeout(function(){
-        activityDiv.css({transition: 'initial'});
-        activityDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
-          activityDiv.remove();
-
-          if(channelDiv.find('div').length == 0) {
-            channelDiv.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
-              channelDiv.remove();
-            }); // OMG this indentation D:
-          }
-        });
-      }, accTime * 1000);
+      drawAgent.destroy(accTime);
     }
 
     SPM.prototype.getInstrumentForChannel = function(channel) {
