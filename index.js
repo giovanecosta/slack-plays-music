@@ -16,9 +16,9 @@ module.exports = function() {
 
     SPM.NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-    SPM.MIN_OCTAVE = 1;
+    SPM.MIN_OCTAVE = 2;
 
-    SPM.MAX_OCTAVE = 6;
+    SPM.MAX_OCTAVE = 5;
 
     SPM.CHAR_TIME = 0.25; // in seconds
 

@@ -14,6 +14,7 @@ module.exports = {
     delicate: new Instrument(INSTRUMENTS.delicate),
     harmonic: new Instrument(INSTRUMENTS.harmonic),
     eletricCello: new Instrument(INSTRUMENTS.eletricCello),
-    kalimba: new Instrument(INSTRUMENTS.kalimba)
+    kalimba: new Instrument(INSTRUMENTS.kalimba),
+    bassGuitar: new Instrument(INSTRUMENTS.bassGuitar)
   }
 }
