@@ -38,13 +38,14 @@ module.exports = function() {
     var destroyFunction = function(delay){ // delay in seconds
 
       setTimeout(function(){
-
-        DrawAdapter.animateDefault(textDiv, DrawAdapter.remove(textDiv, function(){
-
-          if(subjectDiv.find('.text').length == 0) {
-            DrawAdapter.animateDefault(subjectDiv, DrawAdapter.remove(subjectDiv));
-          }
-        }));
+        if(subjectDiv.find('.text').length == 1) {
+          DrawAdapter.animateDefault(subjectDiv, subjectDiv.remove.bind(subjectDiv))
+          .promise().always(function(){
+            textDiv.remove()
+          });
+        } else {
+          DrawAdapter.animateDefault(textDiv, textDiv.remove.bind(textDiv));
+        }
 
       }, delay * 1000);
     }
@@ -55,18 +56,9 @@ module.exports = function() {
     }
   }
 
-  DrawAdapter.remove = function(element, callback) {
-    return function(){
-      element.remove();
-      if(callback) {
-        callback();
-      }
-    }
-  }
-
   DrawAdapter.animateDefault = function(element, callback) {
     element.css({transition: 'initial'});
-    element.animate({flexGrow: 0, height: 0}, 500, 'swing', function(){
+    return element.animate({flexGrow: 0}, 500, 'swing', function(){
       if (callback) {
         callback();
       }
@@ -80,9 +72,8 @@ module.exports = function() {
       subjectDiv = $('<div class="subject" id="' + subject + '"></div>');
       subjectDiv.append('<span> ' + subject + '</span>');
       $(this.rootElement).append(subjectDiv);
-
-      subjectDiv.animate({flexGrow: 1}); // all for the beauty of the world
     }
+    subjectDiv.stop().animate({flexGrow: 1}); // all for the beauty of the world
 
     return subjectDiv;
   }
