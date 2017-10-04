@@ -35,6 +35,7 @@ module.exports = function() {
       console.log('@' + user + ' in ' + channel);
 
       var instrument = this.getInstrumentForChannel(channel);
+      var drawAgent = this.drawAdapter.draw(channel, '@' + user); // adds activity description
 
       var accTime = 0;
 
@@ -46,30 +47,10 @@ module.exports = function() {
 
         var note = this.getNoteFromWord(word);
         var time = this.getSustainFromWord(word);
-
-        instrument.play(note, time, '+' + accTime);
-
-        accTime += time;
-      }
-
-      this.draw(text, channel, user);
-    }
-
-    SPM.prototype.draw = function(text, channel, user) {
-
-      var accTime = 0;
-
-      var drawAgent = this.drawAdapter.draw(channel, '@' + user); // adds activity description
-
-      for (var word of text.split(' ')) {
-        if (word.length == 0){
-          accTime += SPM.CHAR_TIME; // blank space
-          continue;
-        }
-
-        var time = this.getSustainFromWord(word);
         var color = this.getColorFromWord(word);
 
+
+        instrument.play(note, time, '+' + accTime);
         drawAgent.animate(color, accTime);
 
         accTime += time;
@@ -88,10 +69,6 @@ module.exports = function() {
       }
 
       return this.instruments[instrument];
-    }
-
-    SPM.prototype.getColorForChannel = function (channel) {
-      return '#ccc';
     }
 
     // I really don't know how can i name this number
