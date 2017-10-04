@@ -8,8 +8,8 @@ var STATIC_MESSAGES = require('./constants.js').STATIC_MESSAGES;
  */
 module.exports = function() {
 
-    var SPM = function(toneClass, wsAdapter, drawingAdapter){
-      this.tone = toneClass;
+    var SPM = function(instruments, wsAdapter, drawingAdapter){
+      this.instruments = instruments;
       this.wsAdapter = wsAdapter;
       this.drawingAdapter = drawingAdapter;
     };
@@ -34,7 +34,8 @@ module.exports = function() {
     SPM.prototype.play = function(text, channel, user) {
       console.log('@' + user + ' in ' + channel);
 
-      var synth = this.getInstrumentForChannel(channel);
+      var instrument = this.getInstrumentForChannel(channel);
+
 
       var accTime = 0;
 
@@ -47,7 +48,7 @@ module.exports = function() {
         var note = this.getNoteFromWord(word);
         var time = this.getSustainFromWord(word);
 
-        synth.triggerAttackRelease(note, time, '+' + accTime);
+        instrument.play(note, time, '+' + accTime);
 
         accTime += time;
       }
@@ -105,19 +106,15 @@ module.exports = function() {
     }
 
     SPM.prototype.getInstrumentForChannel = function(channel) {
-      // return new this.tone.Synth({
-      //   "oscillator" : {
-      //     "type" : "pwm",
-      //     "modulationFrequency" : 0.2
-      //   },
-      //   "envelope" : {
-      //     "attack" : 0.02,
-      //     "decay" : 0.1,
-      //     "sustain" : 0.2,
-      //     "release" : 0.9,
-      //   }
-      // }).toMaster();
-      return new this.tone.Synth().toMaster();
+      var instrument;
+      // random for now
+      for (instrument in this.instruments) {
+        if(Math.random() < (1 / Object.keys(this.instruments).length)) {
+          break;
+        }
+      }
+
+      return this.instruments[instrument];
     }
 
     SPM.prototype.getColorForChannel = function (channel) {

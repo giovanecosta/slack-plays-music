@@ -7,10 +7,11 @@
       var SPM = require('/dependencies.js').SPM;
       var Tone = require('/dependencies.js').Tone;
       var WebSocketClient = require('/dependencies.js').WebSocketClient;
+      var Instruments = require('/dependencies.js').Instruments;
 
       var wsAdapter = new WebSocketClient('ws://' + location.hostname + ':1337');
 
-      var spm = new SPM(Tone, wsAdapter);
+      var spm = new SPM(Instruments, wsAdapter);
       spm.start();
 
     </script>
