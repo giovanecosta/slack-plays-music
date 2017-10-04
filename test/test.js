@@ -8,9 +8,7 @@ var MockTone = {};
 var drawingAdapter = {};
 
 var Tone = (function(){
-  var Synth = function(){
-
-  }
+  var Synth = function(){}
 
   Synth.prototype.toMaster = sinon.spy();
 
@@ -42,9 +40,27 @@ describe('#SlackPlaysMusic', function() {
 
     });
 
+    context('Play! :D', function(){
+
+      xit('Should play instrument', function(){
+        // Todo implements when play things get testable
+      })
+
+      xit('Should draw activity', function(){
+        // TODO implements when draw things get testable
+      });
+    });
+
   });
 
-  describe('Tranform functions', function(){
+  describe('Transform functions', function(){
+
+    context('Choose instrument', function(){
+
+      xit('Should return standard', function(){
+        // TODO implements when instuments logic is done
+      })
+    });
 
     context('MagicNumber', function(){
 
