@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/giovanecosta/slack-plays-music.svg?branch=master)](https://travis-ci.org/giovanecosta/slack-plays-music) [![Coverage Status](https://coveralls.io/repos/github/giovanecosta/slack-plays-music/badge.svg?branch=master)](https://coveralls.io/github/giovanecosta/slack-plays-music?branch=master&_up=2)
+[![Build Status](https://travis-ci.org/giovanecosta/slack-plays-music.svg?branch=master)](https://travis-ci.org/giovanecosta/slack-plays-music) [![Coverage Status](https://coveralls.io/repos/github/giovanecosta/slack-plays-music/badge.svg?branch=master)](https://coveralls.io/github/giovanecosta/slack-plays-music?branch=master&_up=3)
 
 # slack-plays-music
 
@@ -27,13 +27,13 @@
 ## FAQ
 
   **Q:** Why?!  
-  **A:** _Why not?_  
+  **A:** _Why not?_
 
   **Q:** Do you have social life?  
-  **A:** For what?  
+  **A:** _For what?_
 
   **Q:** You probably should do things you like...  
-  **A:** Uh... I like music... And programming :+1: (psychedelic colors bonus :tada:)  
+  **A:** _Uh... I like music... And programming :+1: (psychedelic colors bonus :tada:)_
 
   **Q:** What you're doing with your life?  
-  **A:** _I ask me this question everyday. Actually i'm a Full-stack Developer @ Quero Education. If you want to work with crazy people like me (or even more crazy and skilled :grin: ), [Click Here](https://jobs.lever.co/quero.education?lever-via=PJaxnQs9vc)_  
+  **A:** _I ask me this question everyday. Actually i'm a Full-stack Developer @ Quero Education. If you want to work with crazy people like me (or even more crazy and skilled :grin: ), [Click Here](https://jobs.lever.co/quero.education?lever-via=PJaxnQs9vc)_

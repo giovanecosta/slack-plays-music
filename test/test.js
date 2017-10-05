@@ -14,7 +14,12 @@ var drawAdapter = {
 };
 
 var Instruments = {
-  standard: {play: sinon.spy()}
+  standard: {play: sinon.spy()},
+  standard2: {play: sinon.spy()},
+  another: {play: sinon.spy()},
+  another2: {play: sinon.spy()},
+  whatelse: {play: sinon.spy()},
+  leitgo: {play: sinon.spy()}
 };
 
 var wsAdapter = {connect: sinon.spy(), registerListener: sinon.spy()};
@@ -30,10 +35,9 @@ describe('#SlackPlaysMusic', function() {
         expect(spm).to.be.an.instanceof(SPM);
       });
 
-
       it('should expose start function', function(){
         var spm = new SPM(Instruments, wsAdapter, drawAdapter);
-        expect(spm).to.have.property('start');
+        expect(spm).to.respondTo('start');
       });
 
       it('should call wsAdapter.connect on start', function(){
@@ -57,7 +61,7 @@ describe('#SlackPlaysMusic', function() {
       var draw = sinon.stub(drawAdapter, 'draw').returns(drawAgent);
 
       it('Should play instrument', function(){
-        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        var spm = new SPM({standard: Instruments.standard}, wsAdapter, drawAdapter);
         spm.play('foo bar', 'bar foo', 'zaa');
 
         var note = spm.getNoteFromPart('f');
@@ -80,10 +84,10 @@ describe('#SlackPlaysMusic', function() {
         expect(drawAgent.destroy.calledWith(0.75)).to.be.true;
       });
 
-      it('Shoul not fail starting with a !', function(){
+      it('Should not fail starting with a ! or charcode less than !', function(){
 
-        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
-        spm.play('!', 'zaa', 'bar');
+        var spm = new SPM({standard: Instruments.standard}, wsAdapter, drawAdapter);
+        spm.play('!' + String.fromCharCode(9), 'zaa', 'bar');
 
         var note = spm.getNoteFromPart('!');
         var color = spm.getColorFromPart('!');
@@ -92,7 +96,7 @@ describe('#SlackPlaysMusic', function() {
         expect(Instruments.standard.play.calledWith(note, 0.25, '+0')).to.be.true;
         expect(draw.calledWith('zaa', '@bar')).to.be.true;
         expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
-        expect(drawAgent.destroy.calledWith(0.25)).to.be.true;
+        expect(drawAgent.destroy.calledWith(0.5)).to.be.true;
       });
 
     });
@@ -105,7 +109,7 @@ describe('#SlackPlaysMusic', function() {
 
       it('Should return an instrument', function(){
         var spm = new SPM(Instruments, wsAdapter, drawAdapter);
-        expect(spm.getInstrumentForChannel('bar')).to.be.equal(Instruments.standard);
+        expect(spm.getInstrumentForChannel('bar')).to.respondTo('play');
       })
     });
 
