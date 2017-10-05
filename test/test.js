@@ -25,6 +25,17 @@ describe('#SlackPlaysMusic', function() {
 
     context('Start App', function(){
 
+      it('should construct the object', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        expect(spm).to.be.an.instanceof(SPM);
+      });
+
+
+      it('should expose start function', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        expect(spm).to.have.property('start');
+      });
+
       it('should call wsAdapter.connect on start', function(){
         var spm = new SPM(Instruments, wsAdapter, drawAdapter);
         spm.start();
@@ -43,10 +54,11 @@ describe('#SlackPlaysMusic', function() {
     });
 
     context('Play! :D', function(){
+      var draw = sinon.stub(drawAdapter, 'draw').returns(drawAgent);
 
       it('Should play instrument', function(){
         var spm = new SPM(Instruments, wsAdapter, drawAdapter);
-        spm.play('foo', 'bar', 'zaa');
+        spm.play('foo bar', 'bar foo', 'zaa');
 
         var note = spm.getNoteFromPart('f');
 
@@ -56,7 +68,6 @@ describe('#SlackPlaysMusic', function() {
 
 
       it('Should call draw adapter', function(){
-        var draw = sinon.stub(drawAdapter, 'draw').returns(drawAgent);
 
         var spm = new SPM(Instruments, wsAdapter, drawAdapter);
         spm.play('foo', 'bar', 'zaa');
@@ -67,6 +78,21 @@ describe('#SlackPlaysMusic', function() {
         expect(draw.calledWith('bar', '@zaa')).to.be.true;
         expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
         expect(drawAgent.destroy.calledWith(0.75)).to.be.true;
+      });
+
+      it('Shoul not fail starting with a !', function(){
+
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        spm.play('!', 'zaa', 'bar');
+
+        var note = spm.getNoteFromPart('!');
+        var color = spm.getColorFromPart('!');
+
+        expect(Instruments.standard.play.called).to.be.true;
+        expect(Instruments.standard.play.calledWith(note, 0.25, '+0')).to.be.true;
+        expect(draw.calledWith('zaa', '@bar')).to.be.true;
+        expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
+        expect(drawAgent.destroy.calledWith(0.25)).to.be.true;
       });
 
     });
