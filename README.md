@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/giovanecosta/slack-plays-music.svg?branch=master)](https://travis-ci.org/giovanecosta/slack-plays-music) [![Coverage Status](https://coveralls.io/repos/github/giovanecosta/slack-plays-music/badge.svg?branch=master)](https://coveralls.io/github/giovanecosta/slack-plays-music?branch=master&_up=1)
+[![Build Status](https://travis-ci.org/giovanecosta/slack-plays-music.svg?branch=master)](https://travis-ci.org/giovanecosta/slack-plays-music) [![Coverage Status](https://coveralls.io/repos/github/giovanecosta/slack-plays-music/badge.svg?branch=master)](https://coveralls.io/github/giovanecosta/slack-plays-music?branch=master&_up=2)
 
 # slack-plays-music
 
