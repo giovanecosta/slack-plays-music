@@ -39,15 +39,17 @@ module.exports = function() {
 
       var accTime = 0;
 
-      for (var word of text.split(' ')) {
-        if (word.length == 0){
-          accTime += SPM.CHAR_TIME; // blank space
+      for (var part of text.match(/(.!*)/g)) {
+
+        var time = this.getSustainFromPart(part);
+
+        if (part.startsWith(' ')){
+          accTime += time; // blank space
           continue;
         }
 
-        var note = this.getNoteFromWord(word);
-        var time = this.getSustainFromWord(word);
-        var color = this.getColorFromWord(word);
+        var note = this.getNoteFromPart(part);
+        var color = this.getColorFromPart(part);
 
 
         instrument.play(note, time, '+' + accTime);
@@ -72,43 +74,47 @@ module.exports = function() {
     }
 
     // I really don't know how can i name this number
-    SPM.prototype.getMagicNumberFromWord = function(word) {
+    SPM.prototype.getMagicNumberFromPart = function(part) {
       var maxLength = SPM.NOTES.length * (SPM.MAX_OCTAVE - SPM.MIN_OCTAVE + 1);
-      var charCode = -1;
-      for (var l of word.split('')) {
-        charCode += l.charCodeAt(0) - '!'.charCodeAt(0) + 1; // ! is the first valid char
+
+      part = part.replace(/!/g, '');
+
+      if(part.length == 0) {
+        return 0;
       }
-      return charCode % maxLength;
+
+      var charCode = (part.charCodeAt(0) - '"'.charCodeAt(0)) % maxLength; // " is the first valid char
+      charCode = charCode < 0 ? 0 : charCode;
+
+      return charCode;
     }
 
-    SPM.prototype.getColorFromWord = function(word) {
+    SPM.prototype.getColorFromPart = function(part) {
       var maxLength = 256 * 256 * 256; // #FFFFFF
       var maxMagicNumberLength = SPM.NOTES.length * (SPM.MAX_OCTAVE - SPM.MIN_OCTAVE + 1);
-      var magicNumber = this.getMagicNumberFromWord(word);
+      part = part.replace(/!/g, '');
+
+      var magicNumber = this.getMagicNumberFromPart(part);
 
       magicNumber = Math.floor((magicNumber * maxLength) / maxMagicNumberLength);
 
       return '#' + ('000000' + (magicNumber).toString(16)).slice(-6);
     }
 
-    SPM.prototype.getNoteFromWord = function(word) {
+    SPM.prototype.getNoteFromPart = function(part) {
       var notes = SPM.NOTES;
       var octave = SPM.MIN_OCTAVE;
       var note = notes[0];
 
-      if (word.length == 0) {
-        return notes[0] + octave; // just a fallback
-      }
+      var magicNumber = this.getMagicNumberFromPart(part);
 
-      var magicNumber = this.getMagicNumberFromWord(word);
-
-      octave = Math.floor(magicNumber / notes.length) + 1;
+      octave = Math.floor(magicNumber / notes.length) + SPM.MIN_OCTAVE;
       note = notes[magicNumber % notes.length];
       return note + octave;
     }
 
-    SPM.prototype.getSustainFromWord = function(word) {
-      return word.length * SPM.CHAR_TIME;
+    SPM.prototype.getSustainFromPart = function(part) {
+      return part.length * SPM.CHAR_TIME;
     }
 
     return SPM;

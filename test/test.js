@@ -65,19 +65,19 @@ describe('#SlackPlaysMusic', function() {
     context('MagicNumber', function(){
 
       it('should return 0', function() {
-        var magicNumber = SPM.prototype.getMagicNumberFromWord('!');
+        var magicNumber = SPM.prototype.getMagicNumberFromPart('"');
         expect(magicNumber).to.equal(0);
-        magicNumber = SPM.prototype.getMagicNumberFromWord('i');
+        magicNumber = SPM.prototype.getMagicNumberFromPart('R');
         expect(magicNumber).to.equal(0);
-        magicNumber = SPM.prototype.getMagicNumberFromWord('hi');
+        magicNumber = SPM.prototype.getMagicNumberFromPart('R!');
         expect(magicNumber).to.equal(0);
       });
 
-      it('should return 71', function() {
-        var magicNumber = SPM.prototype.getMagicNumberFromWord('h');
-        expect(magicNumber).to.equal(71);
-        magicNumber = SPM.prototype.getMagicNumberFromWord('hh');
-        expect(magicNumber).to.equal(71);
+      it('should return 47', function() {
+        var magicNumber = SPM.prototype.getMagicNumberFromPart('Q');
+        expect(magicNumber).to.equal(47);
+        magicNumber = SPM.prototype.getMagicNumberFromPart('Q!!');
+        expect(magicNumber).to.equal(47);
       });
     });
 
@@ -85,20 +85,20 @@ describe('#SlackPlaysMusic', function() {
     context('Color', function(){
 
       it('should return #000000', function(){
-        var color = SPM.prototype.getColorFromWord('!');
+        var color = SPM.prototype.getColorFromPart('"');
         expect(color).to.equal('#000000');
-        color = SPM.prototype.getColorFromWord('i');
+        color = SPM.prototype.getColorFromPart('R');
         expect(color).to.equal('#000000');
-        color = SPM.prototype.getColorFromWord('hi');
+        color = SPM.prototype.getColorFromPart('R!');
         expect(color).to.equal('#000000');
       });
 
       // max possible color with default config
       it('should return #fc71c7', function(){
-        var color = SPM.prototype.getColorFromWord('h');
-        expect(color).to.equal('#fc71c7');
-        color = SPM.prototype.getColorFromWord('hh');
-        expect(color).to.equal('#fc71c7');
+        var color = SPM.prototype.getColorFromPart('Q');
+        expect(color).to.equal('#faaaaa');
+        color = SPM.prototype.getColorFromPart('Q!!');
+        expect(color).to.equal('#faaaaa');
       });
 
     });
@@ -106,35 +106,35 @@ describe('#SlackPlaysMusic', function() {
 
     context('Note', function(){
 
-      it('should return C1', function(){
-        var note = SPM.prototype.getNoteFromWord('!');
-        expect(note).to.equal('C1');
-        note = SPM.prototype.getNoteFromWord('i');
-        expect(note).to.equal('C1');
-        note = SPM.prototype.getNoteFromWord('hi');
-        expect(note).to.equal('C1');
+      it('should return C2', function(){
+        var note = SPM.prototype.getNoteFromPart('"');
+        expect(note).to.equal('C2');
+        note = SPM.prototype.getNoteFromPart('R');
+        expect(note).to.equal('C2');
+        note = SPM.prototype.getNoteFromPart('R!!');
+        expect(note).to.equal('C2');
       });
 
-      it('should return B6', function(){
-        var note = SPM.prototype.getNoteFromWord('h');
-        expect(note).to.equal('B6');
-        note = SPM.prototype.getNoteFromWord('hh');
-        expect(note).to.equal('B6');
+      it('should return B5', function(){
+        var note = SPM.prototype.getNoteFromPart('Q');
+        expect(note).to.equal('B5');
+        note = SPM.prototype.getNoteFromPart('Q!');
+        expect(note).to.equal('B5');
       });
     });
 
     context('Sustain', function(){
       it('should return 0.25', function(){
-        var sustain = SPM.prototype.getSustainFromWord('!');
+        var sustain = SPM.prototype.getSustainFromPart('!');
         expect(sustain).to.equal(0.25);
-        sustain = SPM.prototype.getSustainFromWord('i');
+        sustain = SPM.prototype.getSustainFromPart('i');
         expect(sustain).to.equal(0.25);
       });
 
       it('should return 1', function(){
-        var sustain = SPM.prototype.getSustainFromWord('hder');
+        var sustain = SPM.prototype.getSustainFromPart('hder');
         expect(sustain).to.equal(1);
-        sustain = SPM.prototype.getSustainFromWord('hhe3');
+        sustain = SPM.prototype.getSustainFromPart('hhe3');
         expect(sustain).to.equal(1);
       });
     });
