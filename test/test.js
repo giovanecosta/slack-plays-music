@@ -4,16 +4,18 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 
 var SPM = require('../index');
-var MockTone = {};
-var drawingAdapter = {};
 
-var Tone = (function(){
-  var Synth = function(){}
+var drawAgent = {animate: sinon.spy(), destroy: sinon.spy()};
 
-  Synth.prototype.toMaster = sinon.spy();
+var drawAdapter = {
+  draw: function() {
+    return drawAgent;
+  }
+};
 
-  return Synth
-});
+var Instruments = {
+  standard: {play: sinon.spy()}
+};
 
 var wsAdapter = {connect: sinon.spy(), registerListener: sinon.spy()};
 
@@ -24,13 +26,13 @@ describe('#SlackPlaysMusic', function() {
     context('Start App', function(){
 
       it('should call wsAdapter.connect on start', function(){
-        var spm = new SPM(Tone, wsAdapter, drawingAdapter);
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
         spm.start();
         expect(wsAdapter.connect.called).to.be.true;
       });
 
       it('should call play on WebSocket message', function() {
-        var spm = new SPM(MockTone, wsAdapter, drawingAdapter);
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
         spm.start();
         var play = sinon.stub(spm, 'play');
 
@@ -42,13 +44,31 @@ describe('#SlackPlaysMusic', function() {
 
     context('Play! :D', function(){
 
-      xit('Should play instrument', function(){
-        // Todo implements when play things get testable
-      })
+      it('Should play instrument', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        spm.play('foo', 'bar', 'zaa');
 
-      xit('Should draw activity', function(){
-        // TODO implements when draw things get testable
+        var note = spm.getNoteFromPart('f');
+
+        expect(Instruments.standard.play.called).to.be.true;
+        expect(Instruments.standard.play.calledWith(note, 0.25, '+0')).to.be.true;
       });
+
+
+      it('Should call draw adapter', function(){
+        var draw = sinon.stub(drawAdapter, 'draw').returns(drawAgent);
+
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        spm.play('foo', 'bar', 'zaa');
+
+        var color = spm.getColorFromPart('f');
+
+
+        expect(draw.calledWith('bar', '@zaa')).to.be.true;
+        expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
+        expect(drawAgent.destroy.calledWith(0.75)).to.be.true;
+      });
+
     });
 
   });
@@ -57,8 +77,9 @@ describe('#SlackPlaysMusic', function() {
 
     context('Choose instrument', function(){
 
-      xit('Should return standard', function(){
-        // TODO implements when instuments logic is done
+      it('Should return an instrument', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+        expect(spm.getInstrumentForChannel('bar')).to.be.equal(Instruments.standard);
       })
     });
 
