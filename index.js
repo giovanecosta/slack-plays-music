@@ -22,6 +22,8 @@ module.exports = function() {
 
     SPM.CHAR_TIME = 0.25; // in seconds
 
+    SPM.MULTI_LINES = 3;
+
     SPM.prototype.start = function() {
       this.wsAdapter.registerListener(this.onWsMessage.bind(this));
       this.wsAdapter.connect();
@@ -34,35 +36,86 @@ module.exports = function() {
     SPM.prototype.play = function(text, channel, user) {
       console.log('@' + user + ' in ' + channel);
 
-      var instrument = this.getInstrumentForChannel(channel);
+      var lines = text.split('\n');
+
+      var instrument = this.getInstrumentForChannel(channel, Math.min(lines.length, SPM.MULTI_LINES));
       var drawAgent = this.drawAdapter.draw(channel, '@' + user); // adds activity description
 
       var accTime = 0;
 
-      for (var part of text.match(/(.!*)/g)) {
+      this.processLines(lines, (function(part) {
 
         var time = this.getSustainFromPart(part);
 
-        if (part.startsWith(' ')){
+        if (part.join('').replace(/ /g, '').length == 0){
           accTime += time; // blank space
-          continue;
+          return;
         }
 
-        var note = this.getNoteFromPart(part);
-        var color = this.getColorFromPart(part);
+        var notes = part.map((function(p){ return this.getNoteFromPart(p); }).bind(this));
+        if (notes.length == 1){
+          notes = notes[0];
+        }
 
-
-        instrument.play(note, time, '+' + accTime);
-        drawAgent.animate(color, accTime);
+        var colors = part.map((function(p){ return this.getColorFromPart(p); }).bind(this));
+        console.log(time);
+        instrument.play(notes, time, '+' + accTime);
+        drawAgent.animate(colors, accTime);
 
         accTime += time;
-      }
+      }).bind(this));
 
       drawAgent.destroy(accTime);
+      instrument.destroy(accTime + 0.5);
     }
 
-    SPM.prototype.getInstrumentForChannel = function(channel) {
+    SPM.prototype.processLines = function(lines, callback) {
+      do {
+
+        var chordLines = lines.splice(0, SPM.MULTI_LINES).map(function(line){
+          return line.match(/(.!*)/g);
+        });
+
+        var p = 0;
+        while (true) {
+          var parts = [];
+          var normalizedParts = [];
+          var continueProcessing = false;
+
+          for(var i = 0; i < chordLines.length; i++) {
+            if (chordLines[i].length > 0) {
+              continueProcessing = true;
+              parts.push(chordLines[i].shift());
+            } else {
+              parts.push(' ');
+            }
+          }
+
+          if (!continueProcessing) {
+            break;
+          }
+
+          var minLengthPart = Math.min.apply(this, parts.map(function(_k){ return _k.length; }));
+
+          for(var i = 0; i < parts.length; i++) {
+            var part = parts[i];
+            if (part.length > minLengthPart) {
+              var newPart = part.slice(0, minLengthPart);
+              chordLines[i].unshift(part.slice(minLengthPart).replace(/^!/, newPart.charAt(0)));
+              part = newPart;
+            }
+            normalizedParts.push(part);
+          }
+
+          callback(normalizedParts);
+          p++;
+        }
+      } while (chordLines.length > 0)
+    }
+
+    SPM.prototype.getInstrumentForChannel = function(channel, lines) {
       var instrument;
+      lines = lines || 1;
       // random for now
       for (instrument in this.instruments) {
         if(Math.random() < (1 / Object.keys(this.instruments).length)) {
@@ -70,7 +123,7 @@ module.exports = function() {
         }
       }
 
-      return this.instruments[instrument];
+      return this.instruments[instrument].get(lines);
     }
 
     // I really don't know how can i name this number
@@ -93,6 +146,10 @@ module.exports = function() {
       var maxLength = 256 * 256 * 256; // #FFFFFF
       var maxMagicNumberLength = SPM.NOTES.length * (SPM.MAX_OCTAVE - SPM.MIN_OCTAVE + 1);
       part = part.replace(/!/g, '');
+
+      if (part == ' ') {
+        return 'transparent';
+      }
 
       var magicNumber = this.getMagicNumberFromPart(part);
 

@@ -29,6 +29,9 @@ module.exports = function() {
 
     // delay in seconds
     var animateFunction = function(color, delay) {
+      if (color.length > 1) {
+        color = 'linear-gradient(to left, ' + color.join(', ') + ')';
+      }
       setTimeout(function(){
         textDiv.css({background: color});
       }, delay * 1000);
