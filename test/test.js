@@ -14,12 +14,12 @@ var drawAdapter = {
 };
 
 var Instruments = {
-  standard: {play: sinon.spy()},
-  standard2: {play: sinon.spy()},
-  another: {play: sinon.spy()},
-  another2: {play: sinon.spy()},
-  whatelse: {play: sinon.spy()},
-  leitgo: {play: sinon.spy()}
+  standard: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.standard }},
+  standard2: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.standard2 }},
+  another: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.another }},
+  another2: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.another2 }},
+  whatelse: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.whatelse }},
+  leitgo: {play: sinon.spy(), destroy: sinon.spy(), get: function(){ return Instruments.leitgo }}
 };
 
 var wsAdapter = {connect: sinon.spy(), registerListener: sinon.spy()};
@@ -80,7 +80,7 @@ describe('#SlackPlaysMusic', function() {
 
 
         expect(draw.calledWith('bar', '@zaa')).to.be.true;
-        expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
+        expect(drawAgent.animate.calledWith([color], 0)).to.be.true;
         expect(drawAgent.destroy.calledWith(0.75)).to.be.true;
       });
 
@@ -95,7 +95,7 @@ describe('#SlackPlaysMusic', function() {
         expect(Instruments.standard.play.called).to.be.true;
         expect(Instruments.standard.play.calledWith(note, 0.25, '+0')).to.be.true;
         expect(draw.calledWith('zaa', '@bar')).to.be.true;
-        expect(drawAgent.animate.calledWith(color, 0)).to.be.true;
+        expect(drawAgent.animate.calledWith([color], 0)).to.be.true;
         expect(drawAgent.destroy.calledWith(0.5)).to.be.true;
       });
 

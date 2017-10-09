@@ -58,7 +58,7 @@ module.exports = function() {
         }
 
         var colors = part.map((function(p){ return this.getColorFromPart(p); }).bind(this));
-        console.log(time);
+
         instrument.play(notes, time, '+' + accTime);
         drawAgent.animate(colors, accTime);
 
