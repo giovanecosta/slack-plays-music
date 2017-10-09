@@ -45,7 +45,7 @@ module.exports = function() {
 
       this.processLines(lines, (function(part) {
 
-        var time = this.getSustainFromPart(part);
+        var time = this.getSustainFromPart(part[0]);
 
         if (part.join('').replace(/ /g, '').length == 0){
           accTime += time; // blank space
@@ -76,41 +76,53 @@ module.exports = function() {
           return line.match(/(.!*)/g);
         });
 
-        var p = 0;
-        while (true) {
-          var parts = [];
-          var normalizedParts = [];
-          var continueProcessing = false;
+        var normalizedLines = this.getNormalizedLines(chordLines);
 
-          for(var i = 0; i < chordLines.length; i++) {
-            if (chordLines[i].length > 0) {
-              continueProcessing = true;
-              parts.push(chordLines[i].shift());
-            } else {
-              parts.push(' ');
-            }
-          }
-
-          if (!continueProcessing) {
-            break;
-          }
-
-          var minLengthPart = Math.min.apply(this, parts.map(function(_k){ return _k.length; }));
-
-          for(var i = 0; i < parts.length; i++) {
-            var part = parts[i];
-            if (part.length > minLengthPart) {
-              var newPart = part.slice(0, minLengthPart);
-              chordLines[i].unshift(part.slice(minLengthPart).replace(/^!/, newPart.charAt(0)));
-              part = newPart;
-            }
-            normalizedParts.push(part);
-          }
-
-          callback(normalizedParts);
-          p++;
+        for (var normalizedPart of normalizedLines) {
+          callback(normalizedPart);
         }
+
       } while (chordLines.length > 0)
+    }
+
+    SPM.prototype.getNormalizedLines = function(chordLines) {
+      var normalizedLines = [];
+
+      while (true) {
+        var parts = [];
+        var continueProcessing = false;
+        var normalizedParts = [];
+
+        for(var i = 0; i < chordLines.length; i++) {
+          if (chordLines[i].length > 0) {
+            continueProcessing = true;
+            parts.push(chordLines[i].shift());
+          } else {
+            parts.push(' ');
+          }
+        }
+
+        if (!continueProcessing) {
+          break;
+        }
+
+        var minLengthPart = Math.min.apply(this, parts.map(function(_k){ return _k.length; }));
+
+        for(var i = 0; i < parts.length; i++) {
+          var part = parts[i];
+          if (part.length > minLengthPart) {
+            var newPart = part.slice(0, minLengthPart);
+            chordLines[i].unshift(part.slice(minLengthPart).replace(/^!/, newPart.charAt(0)));
+            part = newPart;
+          }
+
+          normalizedParts.push(part);
+        }
+
+        normalizedLines.push(normalizedParts);
+      }
+
+      return normalizedLines;
     }
 
     SPM.prototype.getInstrumentForChannel = function(channel, lines) {

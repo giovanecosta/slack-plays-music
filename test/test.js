@@ -70,6 +70,16 @@ describe('#SlackPlaysMusic', function() {
         expect(Instruments.standard.play.calledWith(note, 0.25, '+0')).to.be.true;
       });
 
+      it('Should play a chord', function(){
+        var spm = new SPM({standard: Instruments.standard}, wsAdapter, drawAdapter);
+        spm.play("foo\nbar\nzaa", 'bar foo', 'zaa');
+
+        var notes = ['f', 'b', 'z'].map(function(_k){ return spm.getNoteFromPart(_k); });
+
+        expect(Instruments.standard.play.called).to.be.true;
+        expect(Instruments.standard.play.calledWith(notes, 0.25, '+0')).to.be.true;
+      });
+
 
       it('Should call draw adapter', function(){
 
@@ -104,6 +114,34 @@ describe('#SlackPlaysMusic', function() {
   });
 
   describe('Transform functions', function(){
+
+    context('Normalized Lines', function(){
+
+      it('Should return normal notes', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+
+        expect(spm.getNormalizedLines([['a', 'b']])).to.have.deep.members([['a'], ['b']]);
+        expect(spm.getNormalizedLines([['a!', 'b']])).to.have.deep.members([['a!'], ['b']]);
+      });
+
+      it('Should return double chord', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+
+        expect(spm.getNormalizedLines([['a', 'c'], ['b', 'b']])).to.have.deep.members([['a', 'b'], ['c', 'b']]);
+        expect(spm.getNormalizedLines([['a!', 'c'], ['b', 'b!']])).to.have.deep.members([['a', 'b'], ['a', 'b'], ['c', 'b']]);
+        expect(spm.getNormalizedLines([['a!', 'c'], ['b', 'b']])).to.have.deep.members([['a', 'b'], ['a', 'b'], ['c', ' ']]);
+      });
+
+      it('Should return triple chord', function(){
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+
+        expect(spm.getNormalizedLines([['a', 'c'], ['b', 'b'], ['c', 'a']])).to.have.deep.members([['a', 'b', 'c'], ['c', 'b', 'a']]);
+        expect(spm.getNormalizedLines([['a!', 'c'], ['b', 'b!'], ['c', 'a!']])).to.have.deep.members([['a', 'b', 'c'], ['a', 'b', 'a'], ['c', 'b', 'a']]);
+        expect(spm.getNormalizedLines([['a!', 'c'], ['b', 'b'], ['c']])).to.have.deep.members([['a', 'b', 'c'], ['a', 'b', ' '], ['c', ' ', ' ']]);
+        expect(spm.getNormalizedLines([['a!!', 'c'], ['b!', 'b'], ['c!']])).to.have.deep.members([['a!', 'b!', 'c!'], ['a', 'b', ' '], ['c', ' ', ' ']]);
+      });
+
+    });
 
     context('Choose instrument', function(){
 
@@ -142,6 +180,8 @@ describe('#SlackPlaysMusic', function() {
         expect(color).to.equal('#000000');
         color = SPM.prototype.getColorFromPart('R!');
         expect(color).to.equal('#000000');
+        color = SPM.prototype.getColorFromPart(' ');
+        expect(color).to.equal('transparent');
       });
 
       // max possible color with default config
