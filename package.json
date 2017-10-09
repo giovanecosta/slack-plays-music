@@ -1,6 +1,6 @@
 {
   "name": "slack-plays-music",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A nice App that connects with slack and plays music according to channels activity",
   "main": "index.js",
   "scripts": {
