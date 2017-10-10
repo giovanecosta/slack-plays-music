@@ -1,6 +1,7 @@
 'use strict';
 
 var STATIC_MESSAGES = require('./constants.js').STATIC_MESSAGES;
+var SPECIAL_ORIGINS = require('./constants.js').SPECIAL_ORIGINS;
 
 /**
  * Plays Crazy Music
@@ -36,6 +37,8 @@ module.exports = function() {
     SPM.prototype.play = function(text, channel, user) {
       console.log('@' + user + ' in ' + channel);
 
+      text = this.getSpecialText(text, channel, user);
+
       var lines = text.split('\n');
 
       var instrument = this.getInstrumentForChannel(channel, Math.min(lines.length, SPM.MULTI_LINES));
@@ -67,6 +70,15 @@ module.exports = function() {
 
       drawAgent.destroy(accTime);
       instrument.destroy(accTime + 0.5);
+    }
+
+    SPM.prototype.getSpecialText = function(text, channel, user) {
+
+      if (channel == SPECIAL_ORIGINS.PRESENCE_CHANGE) {
+        text = text.replace('presence_', '') + ' ' + user;
+      }
+
+      return text;
     }
 
     SPM.prototype.processLines = function(lines, callback) {

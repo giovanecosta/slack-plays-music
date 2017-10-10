@@ -143,6 +143,17 @@ describe('#SlackPlaysMusic', function() {
 
     });
 
+    context('Special text', function(){
+
+      it('should transform original text', function(){
+
+        var spm = new SPM(Instruments, wsAdapter, drawAdapter);
+
+        expect(spm.getSpecialText('foo bar zaa', 'presence_change', '__presence_away')).to.not.equal('foo bar zaa');
+
+      });
+    });
+
     context('Choose instrument', function(){
 
       it('Should return an instrument', function(){
